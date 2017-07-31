@@ -13,15 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.robinhood.librarysample.ErrorEvent;
+import com.robinhood.librarysample.MessageEvent;
 import com.robinhood.librarysample.R;
-import com.robinhood.librarysample.base.command.ToastNotifyCommand;
-import com.robinhood.librarysample.base.viewmodel.NotifyUpdateViewModelListener;
+import com.robinhood.librarysample.base.command.AlertNotifyCommand;
 import com.robinhood.librarysample.databinding.FragmentIssuesBinding;
-import com.robinhood.librarysample.ui.issues.viewmodel.IssueItemViewModel;
 import com.robinhood.librarysample.ui.issues.viewmodel.IssueViewModel;
 import com.robinhood.librarysample.ui.issues.viewmodel.IssueViewModelImpl;
 
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 public class IssuesFragment extends Fragment {
 
@@ -51,17 +53,32 @@ public class IssuesFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mIssuesAdapter = new IssuesAdapter();
         issuesViewModel = new IssueViewModelImpl();
-        issuesViewModel.setNotifyCommand(new ToastNotifyCommand(getActivity()));
-        issuesViewModel.setUpdateViewModelListener(new NotifyUpdateViewModelListener<List<IssueItemViewModel>>() {
-            @Override
-            public void onUpdatedViewModel(List<IssueItemViewModel> viewModel) {
-                //TODO EventBus를 이용하여 Event를 전달 받아보자
-                mIssuesAdapter.replaceData(viewModel);
-                if (fragmentIssuesBinding.scrollChildSwipeRefreshLayout.isRefreshing()) {
-                    fragmentIssuesBinding.scrollChildSwipeRefreshLayout.setRefreshing(false);
-                }
+        issuesViewModel.setNotifyCommand(new AlertNotifyCommand(getActivity()));
+//        issuesViewModel.setUpdateViewModelListener(new NotifyUpdateViewModelListener<List<IssueItemViewModel>>() {
+//            @Override
+//            public void onUpdatedViewModel(List<IssueItemViewModel> viewModel) {
+//                //TODO EventBus를 이용하여 Event를 전달 받아보자
+//                mIssuesAdapter.replaceData(viewModel);
+//                if (fragmentIssuesBinding.scrollChildSwipeRefreshLayout.isRefreshing()) {
+//                    fragmentIssuesBinding.scrollChildSwipeRefreshLayout.setRefreshing(false);
+//                }
+//            }
+//        });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(MessageEvent messageEvent) {
+        if(messageEvent.getItemVMList() != null) {
+            mIssuesAdapter.replaceData(messageEvent.getItemVMList());
+            if (fragmentIssuesBinding.scrollChildSwipeRefreshLayout.isRefreshing()) {
+                fragmentIssuesBinding.scrollChildSwipeRefreshLayout.setRefreshing(false);
             }
-        });
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onErrorEvent(ErrorEvent errorEvent) {
+        new AlertNotifyCommand(getActivity()).execute(errorEvent.getErrMessage());
     }
 
     @Nullable
@@ -85,6 +102,18 @@ public class IssuesFragment extends Fragment {
             }
         });
         issuesViewModel.fetchIssues();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override

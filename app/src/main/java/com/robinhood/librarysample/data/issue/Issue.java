@@ -4,13 +4,23 @@ package com.robinhood.librarysample.data.issue;
 import com.robinhood.api.github.dto.IssueDTO;
 import com.robinhood.librarysample.base.model.Model;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelProperty;
+
+@Parcel
 public class Issue extends Model {
     private int id;
     private int number;
+
+    @ParcelProperty("writerName")
     private String writerName;
+    @ParcelProperty("title")
     private String title;
+    @ParcelProperty("body")
     private String body;
+    @ParcelProperty("profileThumbnailUrl")
     private String profileThumbnailUrl;
+    @ParcelProperty("state")
     private String state;
 
 

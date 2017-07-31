@@ -1,11 +1,15 @@
 package com.robinhood.librarysample.ui.issues.viewmodel;
 
+import com.robinhood.librarysample.ErrorEvent;
+import com.robinhood.librarysample.MessageEvent;
 import com.robinhood.librarysample.base.command.MessageNotifyCommand;
 import com.robinhood.librarysample.base.viewmodel.NotifyUpdateViewModelListener;
 import com.robinhood.librarysample.data.issue.Issue;
 import com.robinhood.librarysample.data.issue.Issues;
 import com.robinhood.librarysample.data.issue.IssuesDataSource;
 import com.robinhood.librarysample.data.issue.IssuesRepository;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,17 +39,19 @@ public class IssueViewModelImpl implements IssueViewModel {
                     itemVMList.add(new IssueItemViewModelImpl(issue));
                 }
                 //TODO EventBus를 이용하여 이벤트를 전달해보자
-                if (notifyUpdateViewModelListener != null) {
-                    notifyUpdateViewModelListener.onUpdatedViewModel(itemVMList);
-                }
+                EventBus.getDefault().post(new MessageEvent(itemVMList));
+//                if (notifyUpdateViewModelListener != null) {
+//                    notifyUpdateViewModelListener.onUpdatedViewModel(itemVMList);
+//                }
             }
 
             @Override
             public void onIssuesFailed(int code, String message) {
                 //TODO EventBus를 이용하여 이벤트를 전달해보자
-                if (mMessageNotifyCommand != null) {
-                    mMessageNotifyCommand.execute(message);
-                }
+                EventBus.getDefault().post(new ErrorEvent(message));
+//                if (mMessageNotifyCommand != null) {
+//                    mMessageNotifyCommand.execute(message);
+//                }
             }
         });
 

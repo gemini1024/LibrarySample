@@ -2,6 +2,7 @@ package com.robinhood.librarysample.ui.issuedetail;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +15,10 @@ import com.robinhood.librarysample.data.issue.Issue;
 import com.robinhood.librarysample.ui.issuedetail.viewmodel.IssueDetailViewModel;
 import com.robinhood.librarysample.ui.issuedetail.viewmodel.IssueDetailViewModelImpl;
 
+import org.parceler.Parcels;
+
 public class IssueDetailActivity extends AppCompatActivity {
+    public static final String EXTRA_ISSUE_PARCEL = "ISSUE_PARCEL";
     public static final String EXTRA_ISSUE_NUMBER = "ISSUE_NUMBER";
     public static final String EXTRA_ISSUE_TITLE = "ISSUE_TITLE";
     public static final String EXTRA_ISSUE_BODY = "ISSUE_BODY";
@@ -48,12 +52,15 @@ public class IssueDetailActivity extends AppCompatActivity {
     private void getIssueDataFromIntent(Intent intent) {
         if (intent != null) {
             //TODO Parceler를 이용하여 변경 해보자
-            Issue issue = new Issue();
-            issue.setNumber(getIntent().getIntExtra(EXTRA_ISSUE_NUMBER, -1));
-            issue.setTitle(getIntent().getStringExtra(EXTRA_ISSUE_TITLE));
-            issue.setBody(getIntent().getStringExtra(EXTRA_ISSUE_BODY));
-
-            issueDetailViewModel = new IssueDetailViewModelImpl(issue);
+//            Issue issue = new Issue();
+//            issue.setNumber(getIntent().getIntExtra(EXTRA_ISSUE_NUMBER, -1));
+//            issue.setTitle(getIntent().getStringExtra(EXTRA_ISSUE_TITLE));
+//            issue.setBody(getIntent().getStringExtra(EXTRA_ISSUE_BODY));
+            Parcelable parceledIssue = getIntent().getParcelableExtra(EXTRA_ISSUE_PARCEL);
+            if(Parcels.unwrap(parceledIssue) instanceof Issue) {
+                Issue issue = Parcels.unwrap(parceledIssue);
+                issueDetailViewModel = new IssueDetailViewModelImpl(issue);
+            }
         }
     }
 

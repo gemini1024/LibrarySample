@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.robinhood.librarysample.R;
-import com.robinhood.librarysample.base.command.ToastNotifyCommand;
+import com.robinhood.librarysample.base.command.AlertNotifyCommand;
 import com.robinhood.librarysample.base.viewmodel.NotifyUpdateViewModelListener;
 import com.robinhood.librarysample.databinding.FragmentIssueDetailBinding;
 import com.robinhood.librarysample.ui.issuedetail.viewmodel.CommentCommander;
@@ -39,7 +39,7 @@ public class IssueDetailFragment extends Fragment {
         super.onCreate(savedInstanceState);
         mCommentsAdapter = new CommentsAdapter();
         issueDetailViewModel = getArguments().getParcelable(IssueDetailViewModel.class.getName());
-        issueDetailViewModel.setNotifyCommand(new ToastNotifyCommand(getActivity()));
+        issueDetailViewModel.setNotifyCommand(new AlertNotifyCommand(getActivity()));
         initializeIssueViewModel();
     }
 
